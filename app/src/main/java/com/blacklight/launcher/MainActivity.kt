@@ -11,7 +11,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -33,7 +32,6 @@ import androidx.compose.ui.unit.sp
 val ObsidianBlack = Color(0xFF050505)
 val NeonPurple = Color(0xFF9B00FF)
 val DeepPurple = Color(0xFF1A0033)
-val EmberOrange = Color(0xFFB026FF)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +50,7 @@ fun BlackLightVoid() {
     val infiniteTransition = rememberInfiniteTransition(label = "Ash Pulse")
     val ashScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.15f,
+        targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
             animation = tween(2000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
@@ -60,7 +58,7 @@ fun BlackLightVoid() {
         label = "Ash Scale"
     )
     val ashAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.6f,
+        initialValue = 0.7f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(2000, easing = FastOutSlowInEasing),
@@ -80,77 +78,36 @@ fun BlackLightVoid() {
             modifier = Modifier.fillMaxSize()
         )
 
-        // 2. THE ASH HEAP (Bottom Center, resting on the nav bar)
+        // 2. THE ASH HEAP (Single, simplified, glowing)
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .height(120.dp),
-            contentAlignment = Alignment.BottomCenter
-        ) {
-            // Layer 1: The Base Ash (Widest, darkest)
-            Box(
-                modifier = Modifier
-                    .width(180.dp)
-                    .height(40.dp)
-                    .alpha(ashAlpha * 0.4f)
-                    .background(
-                        brush = Brush.radialGradient(
-                            colors = listOf(
-                                DeepPurple,
-                                Color.Transparent
-                            )
-                        ),
-                        shape = RoundedCornerShape(topStart = 100.dp, topEnd = 100.dp)
+                .padding(bottom = 80.dp) // Lifted clearly above the nav bar
+                .size(150.dp)
+                .scale(ashScale)
+                .alpha(ashAlpha)
+                .clip(RoundedCornerShape(topStart = 100.dp, topEnd = 100.dp, bottomStart = 20.dp, bottomEnd = 20.dp))
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            Color.White.copy(alpha = 0.9f),
+                            NeonPurple.copy(alpha = 0.8f),
+                            DeepPurple.copy(alpha = 0.5f),
+                            Color.Transparent
+                        )
                     )
-            )
-
-            // Layer 2: The Glowing Embers (Middle)
-            Box(
-                modifier = Modifier
-                    .width(120.dp)
-                    .height(30.dp)
-                    .alpha(ashAlpha * 0.7f)
-                    .background(
-                        brush = Brush.radialGradient(
-                            colors = listOf(
-                                NeonPurple.copy(alpha = 0.8f),
-                                Color.Transparent
-                            )
-                        ),
-                        shape = RoundedCornerShape(topStart = 100.dp, topEnd = 100.dp)
-                    )
-            )
-
-            // Layer 3: The Core Fire (Smallest, brightest, pulsing)
-            Box(
-                modifier = Modifier
-                    .width(60.dp * ashScale)
-                    .height(20.dp * ashScale)
-                    .alpha(ashAlpha)
-                    .background(
-                        brush = Brush.radialGradient(
-                            colors = listOf(
-                                Color.White.copy(alpha = 0.9f),
-                                EmberOrange.copy(alpha = 0.8f),
-                                NeonPurple.copy(alpha = 0.5f),
-                                Color.Transparent
-                            )
-                        ),
-                        shape = RoundedCornerShape(topStart = 100.dp, topEnd = 100.dp)
-                    )
-                    .clickable {
-                        // VIBRATE TO CONFIRM TAP
-                        val vibrator = context.getSystemService(Vibrator::class.java)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-                        } else {
-                            @Suppress("DEPRECATION")
-                            vibrator.vibrate(50)
-                        }
+                )
+                .clickable {
+                    // VIBRATE TO CONFIRM TAP
+                    val vibrator = context.getSystemService(Vibrator::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+                    } else {
+                        @Suppress("DEPRECATION")
+                        vibrator.vibrate(50)
                     }
-            )
-        }
+                }
+        )
 
         // 3. Faint "BLACK-LIGHT" TEXT at the top
         Text(

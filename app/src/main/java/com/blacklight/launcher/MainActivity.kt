@@ -11,7 +11,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // The Black-Light Colors
-val ObsidianBlack = Color(0xFF050505)
 val NeonPurple = Color(0xFF9B00FF)
 val DeepPurple = Color(0xFF1A0033)
 
@@ -50,7 +49,7 @@ fun BlackLightVoid() {
     val infiniteTransition = rememberInfiniteTransition(label = "Ash Pulse")
     val ashScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.2f,
+        targetValue = 1.15f,
         animationSpec = infiniteRepeatable(
             animation = tween(2000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
@@ -78,36 +77,46 @@ fun BlackLightVoid() {
             modifier = Modifier.fillMaxSize()
         )
 
-        // 2. THE ASH HEAP (Single, simplified, glowing)
-        Box(
+        // 2. THE ASH — Positioned in the DOCK area (where launcher icons sit)
+        // This is the exact row where your Chrome / WhatsApp icons currently sit.
+        Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 80.dp) // Lifted clearly above the nav bar
-                .size(150.dp)
-                .scale(ashScale)
-                .alpha(ashAlpha)
-                .clip(RoundedCornerShape(topStart = 100.dp, topEnd = 100.dp, bottomStart = 20.dp, bottomEnd = 20.dp))
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 0.9f),
-                            NeonPurple.copy(alpha = 0.8f),
-                            DeepPurple.copy(alpha = 0.5f),
-                            Color.Transparent
+                .fillMaxWidth()
+                .padding(bottom = 30.dp), // Sits just above the nav bar
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // THE ASH ICON (The single dock item)
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .scale(ashScale)
+                    .alpha(ashAlpha)
+                    .clip(CircleShape)
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = 0.9f),
+                                NeonPurple,
+                                DeepPurple.copy(alpha = 0.6f),
+                                Color.Transparent
+                            )
                         )
                     )
-                )
-                .clickable {
-                    // VIBRATE TO CONFIRM TAP
-                    val vibrator = context.getSystemService(Vibrator::class.java)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-                    } else {
-                        @Suppress("DEPRECATION")
-                        vibrator.vibrate(50)
+                    .clickable {
+                        // VIBRATE TO CONFIRM TAP
+                        val vibrator = context.getSystemService(Vibrator::class.java)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+                        } else {
+                            @Suppress("DEPRECATION")
+                            vibrator.vibrate(50)
+                        }
+                        // Stage 2 will replace this with the Phoenix Rising
                     }
-                }
-        )
+            )
+        }
 
         // 3. Faint "BLACK-LIGHT" TEXT at the top
         Text(

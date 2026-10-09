@@ -49,21 +49,12 @@ fun BlackLightVoid() {
     val infiniteTransition = rememberInfiniteTransition(label = "Ash Pulse")
     val ashScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.15f,
+        targetValue = 1.1f,
         animationSpec = infiniteRepeatable(
             animation = tween(2000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "Ash Scale"
-    )
-    val ashAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.7f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "Ash Alpha"
     )
 
     Box(
@@ -77,44 +68,46 @@ fun BlackLightVoid() {
             modifier = Modifier.fillMaxSize()
         )
 
-        // 2. THE ASH — Positioned in the DOCK area (where launcher icons sit)
-        // This is the exact row where your Chrome / WhatsApp icons currently sit.
-        Row(
+        // 2. THE ASH ICON (Bottom Center Dock)
+        Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(bottom = 30.dp), // Sits just above the nav bar
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                .padding(bottom = 40.dp) // Sits just above the nav bar
+                .size(80.dp)
+                .scale(ashScale)
+                .clip(CircleShape)
+                .clickable {
+                    // VIBRATE TO CONFIRM TAP
+                    val vibrator = context.getSystemService(Vibrator::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+                    } else {
+                        @Suppress("DEPRECATION")
+                        vibrator.vibrate(50)
+                    }
+                }
         ) {
-            // THE ASH ICON (The single dock item)
+            // The Phoenix Ash Image
+            Image(
+                painter = painterResource(id = R.drawable.phoenix_ash),
+                contentDescription = "Phoenix Ash",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            // A subtle purple glow on top of the image
             Box(
                 modifier = Modifier
-                    .size(64.dp)
-                    .scale(ashScale)
-                    .alpha(ashAlpha)
-                    .clip(CircleShape)
+                    .fillMaxSize()
                     .background(
                         brush = Brush.radialGradient(
                             colors = listOf(
-                                Color.White.copy(alpha = 0.9f),
-                                NeonPurple,
-                                DeepPurple.copy(alpha = 0.6f),
+                                Color.Transparent,
+                                NeonPurple.copy(alpha = 0.2f),
                                 Color.Transparent
                             )
                         )
                     )
-                    .clickable {
-                        // VIBRATE TO CONFIRM TAP
-                        val vibrator = context.getSystemService(Vibrator::class.java)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-                        } else {
-                            @Suppress("DEPRECATION")
-                            vibrator.vibrate(50)
-                        }
-                        // Stage 2 will replace this with the Phoenix Rising
-                    }
             )
         }
 
